@@ -10,14 +10,11 @@
 import sys
 import os
 import random
-import numpy as np
 
 CommonPath = os.path.abspath(os.path.join('..', 'Common'))
 sys.path.append(CommonPath)
 
 import tsp
-
-import logging
 
 def GenerateInitialPath(tour_length):
    tour=list(range(tour_length))
@@ -25,9 +22,6 @@ def GenerateInitialPath(tour_length):
    return tour
 
 MAX_ITERATION = 50000
-
-FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
-logging.basicConfig(format=FORMAT)
 
 def reversed_sections(tour):
     '''generator to return all possible variations where the section between two cities are swapped'''
@@ -46,12 +40,10 @@ def ComputeHillClimb(init_function,move_operator,objective_function,MAX_ITERATIO
     '''
     hillclimb until either MAX_ITERATION is reached or we are at a local optima
     '''
-    best=init_function()
-    best_score=objective_function(best)
+    best       = init_function()
+    best_score = objective_function(best)
     
     iterationCount = 0
-    
-    logging.info('hillclimb started: score=%f',best_score)
     
     while iterationCount < MAX_ITERATION:
         moved = False
@@ -71,7 +63,7 @@ def ComputeHillClimb(init_function,move_operator,objective_function,MAX_ITERATIO
         if not moved:
             break # must be at a local maximum
     
-    logging.info('hillclimb finished: iterationCount=%d, best_score=%f',iterationCount,best_score)
+    print('hillclimb finished: iterationCount=%d, best_score=%f'%(iterationCount,best_score))
     return (iterationCount,best_score,best)
 
 def ComputeHillClimbAndRestart(init_function,move_operator,objective_function,MAX_ITERATION):
@@ -79,29 +71,31 @@ def ComputeHillClimbAndRestart(init_function,move_operator,objective_function,MA
     shortestPathLength = 0
     
     iterationCount = 0
+    
     while iterationCount < MAX_ITERATION:
         remaining_evaluations = MAX_ITERATION - iterationCount
         
         print('(re)starting hillclimb %d/%d remaining'%(remaining_evaluations,MAX_ITERATION))
-        evaluated, pathLength, foundShortestPath = hillclimb(init_function,move_operator,objective_function,remaining_evaluations)
+        evaluated, pathLength, foundShortestPath = ComputeHillClimb(init_function,move_operator,objective_function,remaining_evaluations)
         
         iterationCount += evaluated
-        if pathLength > shortestPathLength or best is None:
+        
+        if pathLength > shortestPathLength or shortestPath is None:
             shortestPathLength = pathLength
-            shortestPathLength = foundShortestPath
+            shortestPath       = foundShortestPath
         
     return (iterationCount,shortestPathLength, shortestPath)
 
 def SolveTSP():
     print("Starting to solve travel salesman problem")
-    coordinates  = tsp.ReadCoordinatesFromFile(".\cityCoordinates.csv")
+    coordinates     = tsp.ReadCoordinatesFromFile(".\cityCoordinates.csv")
     distance_matrix = tsp.ComputeDistanceMatrix(coordinates);
     
     init_function      = lambda: GenerateInitialPath(len(coordinates))
     objective_function = lambda tour: -tsp.ComputeTourLength(distance_matrix, tour)
     
-    #iterationCount,best_score,shortestPath = hillclimb(init_function, reversed_sections, objective_function, MAX_ITERATION)
-    iterationCount,best_score,shortestPath = hillclimb_and_restart(init_function, reversed_sections, objective_function, MAX_ITERATION)
+    #iterationCount,best_score,shortestPath = ComputeHillClimb(init_function, reversed_sections, objective_function, MAX_ITERATION)
+    iterationCount,best_score,shortestPath = ComputeHillClimbAndRestart(init_function, reversed_sections, objective_function, MAX_ITERATION)
     
     print(iterationCount, best_score, shortestPath);
     
