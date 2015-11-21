@@ -1,6 +1,16 @@
-#The traveling salesman problem (TSP) asks for the shortest route to visit a collection of cities and return to the starting point
+#==============================================================================
+#description     : TSP
+#author          : Yakup Cengiz
+#date            : 20151121
+#version         : 0.1
+#notes           : The traveling salesman problem (TSP) asks for the shortest route to visit a collection of cities and return to the starting point
+#python_version  : 3.5.0  
+#==============================================================================
+
+#
 import os
 import math
+import random
 import csv
 import itertools
 
@@ -27,7 +37,12 @@ def ReadCoordinatesFromFile(filePath):
     try:
         reader = csv.reader(f);
         for row in reader:
-             coordinates.append((float(row[0]),float(row[1])))
+            try:
+                coordinates.append((float(row[0]),float(row[1])))
+            except:
+                print(row)
+                #raise Exception("exception occurred during reading file");
+                
     finally:
         f.close()
     
@@ -51,6 +66,18 @@ def AllPermutations(iterable, r=None):
         if len(set(indices)) == r:
             yield tuple(pool[i] for i in indices)
             
+def AllEdges(size, shuffle = random.shuffle):
+    r1 = list(range(size))
+    r2 = list(range(size))
+    
+    if shuffle:
+       shuffle(r1)
+       shuffle(r2)
+        
+    for i in r1:
+        for j in r2:
+            yield (i,j)
+         
 def DrawPath(coords,tour,img_file):
     padding = 30
     coords=[(x+padding,y+padding) for (x,y) in coords]

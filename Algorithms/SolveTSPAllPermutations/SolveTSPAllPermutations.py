@@ -1,11 +1,10 @@
-#title           :pyscript.py
-#description     :This will create a header for a python script.
-#author          :bgw
-#date            :20110930
-#version         :0.4
-#usage           :python solveTSPAllPermutations.py
+#==============================================================================
+#description     : Solves travelling salesman problem by generating all possible states
+#author          : Yakup Cengiz
+#date            : 20151121
+#version         : 0.1
 #notes           :
-#python_version  :3.5.0  
+#python_version  : 3.5.0  
 #==============================================================================
 
 import sys
