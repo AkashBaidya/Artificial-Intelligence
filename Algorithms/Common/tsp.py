@@ -5,6 +5,7 @@
 #version         : 0.1
 #notes           : The traveling salesman problem (TSP) asks for the shortest route to visit a collection of cities and return to the starting point
 #python_version  : 3.5.0  
+#Reference       : http://www.psychicorigami.com/category/tsp/
 #==============================================================================
 
 #
